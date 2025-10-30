@@ -1,0 +1,15 @@
+# Virtual Environment
+venv/
+
+# Compiled Python Files
+__pycache__/
+*.pyc
+
+# Local Development Files
+.idea/
+.vscode/
+
+# Data and Logs
+*.db
+*.sqlite3
+*.log
