@@ -1,6 +1,5 @@
 from traceback import print_tb
-
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Date
 from sqlalchemy.orm import sessionmaker, declarative_base, foreign, relationship
 from datetime import datetime
 
@@ -27,7 +26,7 @@ class Exercise(Base):
 class Workout(Base):
     __tablename__ = "workouts"
     id = Column(Integer, primary_key=True)
-    workout_date = Column(String)
+    workout_date = Column(Date)
     name = Column(String)
     duration = Column(Float)
 
@@ -51,7 +50,7 @@ class GymTracker:
         session = self.Session()
         try:
             new_workout = Workout(
-                workout_date=workout_data[0],
+                workout_date=datetime.strptime(workout_data[0], "%Y-%m-%d"),
                 name=workout_data[1],
                 duration=workout_data[2],
             )
@@ -96,34 +95,51 @@ class GymTracker:
 
     def show_workouts(self):
         session = self.Session()
+        try:
+            workouts = session.query(Workout).order_by(Workout.id.desc()).all()
+            if not workouts:
+                print("No workouts found.")
+                return 0 
+            for workout in workouts:
+                print(f"ID: {workout.id}, Name: {workout.name}, Date: {workout.workout_date}, Duration: {workout.duration}")
+
+            return len(workouts)
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return 0
+        finally:
+            session.close()    
+        
+    def get_all_workouts_json(self):
+        session = self.Session()
+        data = []
 
         try:
             workouts = session.query(Workout).order_by(Workout.id.desc()).all()
 
-            if not workouts:
-                print("No saved workouts.")
-                return 0
-            else:
-                print("\n Your saved workouts")
             for workout in workouts:
-                print(
-                    f"\n[ID: {workout.id}] Date: {workout.workout_date} | Name: {workout.name} | Duration: {workout.duration} min"
-                )
-
-                if workout.exercises:
-                    print("  Exercises:")
-                    for exercise in workout.exercises:
-                        print(
-                            f"      - {exercise.name}: {exercise.sets} sets, {exercise.reps} reps, {exercise.weight} kg"
-                        )
-                else:
-                    print("    (No saved exercises for that workout.)")
-            return len(workouts)
+                workout_dict = {
+                    "id": workout.id,
+                    "name": workout.name,
+                    "date": str(workout.workout_date),
+                    "duration": workout.duration,
+                    "exercises": [
+                        {
+                            "name": ex.name,
+                            "sets": ex.sets,
+                            "reps": ex.reps,
+                            "weight": ex.weight,
+                        }
+                        for ex in workout.exercises
+                    ],
+                }
+                data.append(workout_dict)
+            return data
 
         except Exception as e:
-            print(f"Error while showing workouts: {e}")
-            return 0
-
+            print(f"Error while converting to JSON: {e}")
+            return []
         finally:
             session.close()
 
@@ -171,7 +187,7 @@ class GymTracker:
 
             if workout:
                 workout.name = new_name
-                workout.workout_date = new_date
+                workout.workout_date = datetime.strptime(new_date, "%Y-%m-%d")
                 workout.duration = new_duration
 
                 session.commit()
