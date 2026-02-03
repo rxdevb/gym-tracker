@@ -9,7 +9,7 @@
 
 ## About The Project
 
-Gym Tracker is a full-stack web application designed for efficient workout logging. It prioritizes speed and clarity, featuring a minimalist "Digital Brutalism" interface that eliminates distractions and focuses on raw performance metrics.
+Gym Tracker is a full-stack web application designed for efficient workout logging. It prioritizes speed and clarity, featuring a minimalist interface that eliminates distractions and focuses on raw performance metrics.
 
 The application allows users to manage their training sessions with full CRUD capabilities, offering inline editing for rapid data entry during workouts.
 
