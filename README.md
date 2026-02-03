@@ -65,7 +65,3 @@ To get a local copy up and running, follow these simple steps.
 The project follows a Monorepo structure:
 *   `/backend` - Contains the Flask API and SQLite database models.
 *   `/frontend` - Contains the React client application.
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
